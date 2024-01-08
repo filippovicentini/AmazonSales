@@ -5,11 +5,26 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.ticker as ticker
+from imblearn.over_sampling import RandomOverSampler
+from sklearn.preprocessing import OneHotEncoder,MinMaxScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import make_pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.model_selection import GridSearchCV,train_test_split
+from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay,roc_curve,roc_auc_score
+from sklearn import set_config
+set_config(display = "diagram")  
 from functions import where_nan
 from functions import amazon_net_revenue
 from functions import average_monthly_order_amount
 from functions import top_product_revenue_by_month
 from functions import sales_by_product_size
+from functions import heatmap_category_size
+from functions import top_cities
+from functions import order_rejection
 
 #loading dataset
 df = pd.read_csv('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
@@ -184,3 +199,11 @@ top_product_revenue_by_month(df)
 #Show sales by product size
 sales_by_product_size(df)
 
+#Show heatmap of quantity sold by Category and Size
+heatmap_category_size(df)
+
+#Show top 10 cities with the most orders
+top_cities(df)
+
+#Order rejection classification
+order_rejection(df)

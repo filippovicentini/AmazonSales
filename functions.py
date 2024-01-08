@@ -4,6 +4,18 @@ import numpy as np
 import os 
 import matplotlib.pyplot as plt
 import seaborn as sns
+from imblearn.over_sampling import RandomOverSampler
+from sklearn.preprocessing import OneHotEncoder,MinMaxScaler
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import make_pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.model_selection import GridSearchCV,train_test_split
+from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay,roc_curve,roc_auc_score
+from sklearn import set_config
+set_config(display = "diagram")  
 
 #this function shows with a graphic the distribution of NaN values in the dataset
 def where_nan(df):
@@ -11,6 +23,7 @@ def where_nan(df):
     plt.title("Distribution of NaN Values")
     plt.show()
 
+#this function show the net revenue
 def amazon_net_revenue(df):
     sns.set_style('whitegrid')
 
@@ -74,6 +87,7 @@ def amazon_net_revenue(df):
     ax.spines['bottom'].set_color('black')
     plt.show()
 
+#this function shows the average monthly order amount
 def average_monthly_order_amount(df):
     # Group the data by month and calculate the average order value
     monthly_aov = df.groupby(pd.Grouper(key='date', freq='M')).agg({'order_amount_($)': 'sum', 'order_ID': 'nunique'})
@@ -114,6 +128,7 @@ def average_monthly_order_amount(df):
 
     plt.show()
 
+#this function shows the top product revenue by month
 def top_product_revenue_by_month(df):
     import warnings
     warnings.filterwarnings('ignore')
@@ -190,6 +205,7 @@ def top_product_revenue_by_month(df):
     plt.show()
     warnings.filterwarnings('default')  # Re-enable the warnings
 
+#this function shows the sales by product size
 def sales_by_product_size(df):
     # Group the data by product size and calculate the total sales
     sales_by_size = df.groupby('size')['order_amount_($)'].sum()
@@ -239,3 +255,184 @@ def sales_by_product_size(df):
     ax.spines['bottom'].set_color('black')
 
     plt.show()
+
+#heatmap of quantity sold by category and size
+def heatmap_category_size(df):
+    heatmap_data = df.pivot_table(index='product_category', columns='size', values='order_quantity', 
+                                  aggfunc='sum', fill_value=0)
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(heatmap_data, cmap='YlGnBu', annot=True, fmt='d', linewidths=.5)
+    plt.title('Heatmap of Quantity Sold by Category and Size')
+    plt.show()
+
+#top 10 cities with the most orders
+def top_cities(df):
+    pd.value_counts(df['city'])[0:10].plot(kind = 'pie' , autopct = '%1.0f%%')
+    plt.title('Top 10 cities with the most orders' , fontsize = 16, fontweight = "bold")
+    plt.show()
+
+#this function cleans the original dataset
+def df_cleaning(df):
+    df.drop(columns= ['index','Unnamed: 22', 'fulfilled-by', 'ship-country', 
+                  'currency', 'Sales Channel '], inplace = True)
+    df.drop_duplicates(['Order ID','ASIN'],inplace = True,ignore_index=True)
+    df['Courier Status'].fillna('unknown',inplace=True)
+    df['promotion-ids'].fillna('no promotion',inplace=True)
+    df['Amount'].fillna(0,inplace=True)
+    df['ship-city'].fillna('unknown', inplace = True)
+    df['ship-postal-code'] = df['ship-postal-code'].astype(str)
+    df['ship-postal-code'].fillna('unknown', inplace=True)
+    df['ship-state'].fillna('unknown', inplace = True)
+    mapper = {'Order ID':'order_ID', 'Date':'date', 'Status':'ship_status','Fulfilment':'fullfilment',
+          'ship-service-level':'service_level', 'Style':'style', 'SKU':'sku', 'Category':'product_category', 
+          'Size':'size', 'ASIN':'asin', 'Courier Status':'courier_ship_status', 'Qty':'order_quantity', 
+          'Amount':'order_amount_($)', 'ship-city':'city', 'ship-state':'state', 'ship-postal-code':'zip', 
+          'promotion-ids':'promotion','B2B':'customer_type'}
+    df.rename(columns=mapper, inplace =True)
+    exchange_rate = 0.0120988
+    df['order_amount_($)'] = df['order_amount_($)'].apply(lambda x: x * exchange_rate)
+    df['customer_type'].replace(to_replace=[True,False],value=['business','customer'], inplace=True)
+    df['date'] = pd.to_datetime(df['date'], format='%m-%d-%y')
+    march_dates = df['date'][df['date'].dt.month == 3]
+    df = df[(df['date'].dt.month != 3)]
+    df['month'] = df['date'].dt.month
+    month_map = { 4: 'april',5: 'may',6: 'june'}
+    df['month'] = df['date'].dt.month.map(month_map)
+    month_order = ['april', 'may', 'june']
+    df['month'] = pd.Categorical(df['month'], categories=month_order, ordered=True)
+    size_order = ['Free','XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL']
+    df['size'] = pd.Categorical(df['size'], categories=size_order, ordered=True)
+
+#this function predicts the likelihood of order rejection
+def order_rejection(df):
+    df_rejection = df.copy()
+    # bar chart using matplotlib package
+    fig,ax = plt.subplots(figsize = (7,5))
+    # calculate and store the proportion values in a pandas.Series
+    orderid_repeat_rows = df_rejection[df_rejection["order_ID"].duplicated(keep = False)]
+    unique_orderid_repeat_list = orderid_repeat_rows["order_ID"].unique()
+    plot_dataseries = round(df_rejection["order_ID"].isin(unique_orderid_repeat_list).
+                        value_counts(normalize = True)*100,2)
+
+    # plot the bar chart
+    plot_dataseries.plot(kind = "bar",ax =ax)
+    plt.title("Proportions of Single-Product \nand Multipl-Product Orders", fontsize = 16)
+    plt.ylabel("Proportion", fontsize = 14)
+    plt.xlabel("Order Types", fontsize = 14)
+    plt.xticks(ticks = plot_dataseries.index,
+            labels = ["Single-Product Orders", "Mutiple-Product Orders"], rotation = "horizontal")
+    plt.yticks(ticks = [20,40,60,80,100,120], labels = ["20%","40%","60%","80%","100%","120%"])
+
+    # create another two series with values to be diaplayed as data-label/value-label in the chart
+    data_label = plot_dataseries.astype(str).str.cat(np.full((2,),"%"), sep = "")
+    count_label = pd.Series(df_rejection["order_ID"].isin(unique_orderid_repeat_list).value_counts()).astype("str")
+
+    # add/plot the data-label in the chart
+    # in percentage format
+    for x,y in enumerate(plot_dataseries):
+        plt.text(x,y-10,data_label[x],color = "white",
+                fontweight = 700,fontsize = 14, horizontalalignment = "center")
+    
+    # in count values format
+    for x,y in enumerate(plot_dataseries):
+        plt.text(x,y+5,("Count:\n"+count_label[x]),color = "Darkgreen",
+                fontweight = 700,fontsize = 14, horizontalalignment = "center")
+    plt.show()
+    # drop the orderids with multiple products
+    df_rejection = df_rejection[df_rejection["order_ID"].duplicated(keep = False) == False]
+    # drop redundant column "orderid"
+    df_rejection.drop("order_ID", axis = 1, inplace = True)
+    #Create a column named "rejected" as the target feature with two unique values (classifications): 1 and 0 representing rejected and not-rejected respectively
+    # drop the rows with unsure rejection status
+    known_value = ["Cancelled", 'Shipped - Returned to Seller','Shipped - Rejected by Buyer',
+                'Shipped - Returning to Seller','Shipped - Delivered to Buyer']
+    df_rejection = df_rejection[df_rejection['ship_status'].isin(known_value)]   
+
+    # create a col "rejected" where value 1 means rejected and 0 means not-rejected" 
+    rejected = ["Cancelled", 'Shipped - Returned to Seller','Shipped - Rejected by Buyer',
+                'Shipped - Returning to Seller']
+    df_rejection["rejected"] = df['ship_status'].isin(rejected).astype(int)    # change the dtype to "int" 
+
+    # drop col "status" 
+    df_rejection.drop("ship_status",axis = "columns", inplace = True)
+    # bar chart using matplotlib package
+    fig,ax = plt.subplots(figsize = (7,5))
+
+    # calculate and store the proportion values in a pandas.Series
+    plot_dataseries = round(df_rejection["rejected"].value_counts(normalize = True)*100,2)
+
+    # plot the bar chart
+    plot_dataseries.plot(kind = "bar",ax =ax)
+    plt.title("Proportions of rejected and not-rejected orders", fontsize = 14)
+    plt.ylabel("Proportion", fontsize = 12)
+    plt.xlabel("Status", fontsize = 12)
+    plt.xticks(ticks = range(len(plot_dataseries)),
+            labels = ["Not Rejected", "Rejected"], rotation = "horizontal")
+    plt.yticks(ticks = [20,40,60,80,100], labels = ["20%","40%","60%","80%","100%"])
+
+    # create another series with values to be diaplayed as data-label/value-label in the chart
+    data_label = plot_dataseries.astype(str).str.cat(np.full((2,),"%"), sep = "")
+
+    # create one more series to to display count
+    data_count = df_rejection["rejected"].value_counts()
+
+    # add/plot the data-label in the chart
+    for x,y in enumerate(plot_dataseries):
+        plt.text(x,y-10,data_label[x],color = "white",
+                fontweight = 700,fontsize = 13, horizontalalignment = "center")
+
+    # add count label
+    for x,y in enumerate(plot_dataseries):
+        plt.text(x,y+5,"Count:\n" + str(data_count[x]),fontweight = 700,
+                fontsize = 13,horizontalalignment = "center")
+    
+    plt.show()
+    print(df_rejection.info())
+    # drop the redundant cols " in the dataset
+    df_rejection.drop(["date","fullfilment","promotion","courier_ship_status"],axis ="columns", inplace = True)
+    # drop high cardinality features
+    df_rejection.drop(["style","sku","city","zip","asin"],axis = 1, inplace = True)
+    df_rejection.drop("order_quantity", axis = "columns", inplace = True)
+    df_rejection = df_rejection[(df_rejection["order_amount_($)"] < df_rejection["order_amount_($)"].quantile(0.95)) | df["order_amount_($)"].isnull()]
+    df_rejection["region"] = df_rejection["state"].replace({
+        "MAHARASHTRA":"westindia","KARNATAKA":"southindia",
+        'PUDUCHERRY':"southindia",'TELANGANA':"southindia",
+        'ANDHRA PRADESH':"southindia", 'HARYANA':"northindia",
+        'JHARKHAND':"eastindia", 'CHHATTISGARH':"eastindia",
+        'ASSAM':"northeastindia",'ODISHA':"eastindia",
+        'UTTAR PRADESH':"northindia", 'GUJARAT':"westindia",
+        'TAMIL NADU':"southindia", 'UTTARAKHAND':"northindia",
+        'WEST BENGAL':"eastindia", 'RAJASTHAN':"westindia",
+        'NEW DELHI':"centralindia",'MADHYA PRADESH':"centralindia",
+        'KERALA':"southindia", 'JAMMU & KASHMIR':"northindia",
+        'BIHAR':"eastindia",'MEGHALAYA':"northeastindia",
+        'PUNJAB':"northindia", 'GOA':"southindia",
+        'TRIPURA':"northeastindia", 'CHANDIGARH':"northindia",
+        'HIMACHAL PRADESH':"northindia",'SIKKIM':"northeastindia",
+        "ANDAMAN & NICOBAR ":"eastindia", 'MANIPUR':"northeastindia",
+        'MIZORAM':"northeastindia",'NAGALAND':"northeastindia",
+        'ARUNACHAL PRADESH':"northeastindia", 'LADAKH':"northindia",
+        'DADRA AND NAGAR':"westindia",'LAKSHADWEEP':"southindia"
+    })
+
+    # drop rows with "UNKNOWN" shipstates
+    df_rejection = df_rejection[df_rejection["state"] != "unknown"]
+    df_rejection.drop("state",axis = "columns", inplace = True)
+
+    #Split the Dataset into target vector and feature matrix
+    target = "rejected"
+    y = df_rejection[target]     # target vector
+    X = df_rejection.drop(target, axis = "columns")   # feature matrix/dataframe
+
+    #display target vector and feature matrix
+    print("Target Vector:")
+    print(y.head())
+    print("\nThe feature matrix:")
+    print(X.head())
+    
+    # split the datasets into training and test datasets
+    X_train,X_test,y_train,y_test = train_test_split(X,y,test_size= 0.2,random_state = 42)
+
+    # print the shape of the training and testing datasets
+    print(f"Shape of X_train :{X_train.shape}\nShape of X_test: {X_test.shape}",
+        f"\nShape of y_train: {y_train.shape}\nShape of y_test: {y_test.shape}")
