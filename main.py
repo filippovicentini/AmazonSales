@@ -17,14 +17,7 @@ from sklearn.model_selection import GridSearchCV,train_test_split
 from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay,roc_curve,roc_auc_score
 from sklearn import set_config
 set_config(display = "diagram")  
-from functions import where_nan
-from functions import amazon_net_revenue
-from functions import average_monthly_order_amount
-from functions import top_product_revenue_by_month
-from functions import sales_by_product_size
-from functions import heatmap_category_size
-from functions import top_cities
-from functions import order_rejection
+from functions import *
 
 #loading dataset
 df = pd.read_csv('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
