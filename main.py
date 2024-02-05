@@ -22,6 +22,7 @@ from functions import *
 #loading dataset
 df = pd.read_csv('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
+""""
 #initial dataset view
 print(df.head())
 print()
@@ -34,7 +35,7 @@ print()
 print(df.describe().T)
 where_nan(df)
 print(df.isnull().sum())
-
+"""
 """
 DATA CLEANING:
 - Columns to drop: 
@@ -58,6 +59,7 @@ DATA CLEANING:
     month - to use in analysis and groupbys
 - Column Value Ordering
     size - created an ordered category of based on product sizes
+"""
 """
 #dropping columns
 df.drop(columns= ['index','Unnamed: 22', 'fulfilled-by', 'ship-country', 
@@ -179,24 +181,27 @@ print("\n")
 avg_order_amount_by_customer_type = df.groupby('customer_type')['order_amount_($)'].mean()
 print("Average order amount by customer type:")
 print(avg_order_amount_by_customer_type.apply(lambda x: "${:,.2f}".format(x)))
-
+"""
 #Show amazon net revenue
-amazon_net_revenue(df)
+#amazon_net_revenue('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
 #Show average monthly order amount
-average_monthly_order_amount(df)
+#average_monthly_order_amount('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
 #Show top product revenue by month
-top_product_revenue_by_month(df)
+#top_product_revenue_by_month('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
 #Show sales by product size
-sales_by_product_size(df)
+#sales_by_product_size('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
 #Show heatmap of quantity sold by Category and Size
-heatmap_category_size(df)
+#heatmap_category_size('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
 #Show top 10 cities with the most orders
-top_cities(df)
+#top_cities('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
-#Order rejection classification
-order_rejection(df)
+#Order rejection classification vice
+#order_rejection(df)
+
+#Order rejection classification kaggle
+order_rejection_kaggle('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
