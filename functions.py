@@ -423,8 +423,8 @@ def df_cleaning_modeling_phase(filepath):
     return df
 
 #this function predicts the likelihood of order rejection
-def order_rejection(df):
-    df_rejection = df.copy()
+def order_rejection(filepath):
+    df_rejection = df_cleaning_vis_phase(filepath)
     df_rejection['size'] = df_rejection['size'].astype(object)
     df_rejection['month'] = df_rejection['month'].astype(object)
     # bar chart using matplotlib package
@@ -472,7 +472,7 @@ def order_rejection(df):
     # create a col "rejected" where value 1 means rejected and 0 means not-rejected" 
     rejected = ["Cancelled", 'Shipped - Returned to Seller','Shipped - Rejected by Buyer',
                 'Shipped - Returning to Seller']
-    df_rejection["rejected"] = df['ship_status'].isin(rejected).astype(int)    # change the dtype to "int" 
+    df_rejection["rejected"] = df_rejection['ship_status'].isin(rejected).astype(int)    # change the dtype to "int" 
 
     # drop col "status" 
     df_rejection.drop("ship_status",axis = "columns", inplace = True)
@@ -514,7 +514,7 @@ def order_rejection(df):
     # drop high cardinality features
     df_rejection.drop(["style","sku","city","zip","asin"],axis = 1, inplace = True)
     df_rejection.drop("order_quantity", axis = "columns", inplace = True)
-    df_rejection = df_rejection[(df_rejection["order_amount_($)"] < df_rejection["order_amount_($)"].quantile(0.95)) | df["order_amount_($)"].isnull()]
+    df_rejection = df_rejection[(df_rejection["order_amount_($)"] < df_rejection["order_amount_($)"].quantile(0.95)) | df_rejection["order_amount_($)"].isnull()]
     df_rejection["region"] = df_rejection["state"].replace({
         "MAHARASHTRA":"westindia","KARNATAKA":"southindia",
         'PUDUCHERRY':"southindia",'TELANGANA':"southindia",
@@ -1064,15 +1064,127 @@ def order_rejection_kaggle(filepath):
     X_trainrf, X_testrf, y_trainrf, y_testrf = train_test_split(X_encoded, y, test_size=0.2, random_state=42)
     model = RandomForestClassifier()
     model.fit(X_trainrf, y_trainrf)
-    y_pred = model.predict(X_testrf)
-    print(accuracy_score(y_pred, y_testrf))
+    y_train_predrf = model.predict(X_trainrf)
     # Calcolare la matrice di confusione
-    conf_matrix = confusion_matrix(y_testrf, y_pred)
+    conf_matrix_train_rf = confusion_matrix(y_trainrf, y_train_predrf)
 
     # Visualizzare la matrice di confusione con Seaborn
-    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", cbar=False)
+    sns.heatmap(conf_matrix_train_rf, annot=True, fmt="d", cmap="Blues", cbar=False)
+    plt.title("Confusion Matrix - Train Dataset (Random Forest Classifier)")
+    plt.xlabel("Predicted Label")
+    plt.ylabel("True Label")
+    plt.show()
+
+    # Accuracy
+    accuracy_train_rf = round(model.score(X_trainrf,y_trainrf)*100,2)
+    print(f"ACCURACY SCORE (Training) : {accuracy_train_rf}%")
+
+    # Precision
+    precision_train_rf = round(conf_matrix_train_rf[1,1]/(conf_matrix_train_rf[1,1]+conf_matrix_train_rf[0,1])*100,2)
+    print("PRECISION SCORE (Training): ",precision_train_rf,"%")
+
+    # Recall
+    recall_train_rf = round(conf_matrix_train_rf[1,1]/(conf_matrix_train_rf[1,1]+conf_matrix_train_rf[1,0])*100,2)
+    print("RECALL SCORE (Training): ",recall_train_rf,"%")
+
+    # setting seaborn display again (to be applied after this cell execution)
+    sns.set()
+
+    y_test_predrf = model.predict(X_testrf)
+    # Calcolare la matrice di confusione
+    conf_matrix_test_rf = confusion_matrix(y_testrf, y_test_predrf)
+
+    # Visualizzare la matrice di confusione con Seaborn
+    sns.heatmap(conf_matrix_test_rf, annot=True, fmt="d", cmap="Blues", cbar=False)
     plt.title("Confusion Matrix - Test Dataset (Random Forest Classifier)")
     plt.xlabel("Predicted Label")
     plt.ylabel("True Label")
     plt.show()
+
+    # Accuracy
+    accuracy_test_rf = round(model.score(X_testrf,y_testrf)*100,2)
+    print(f"ACCURACY SCORE (Training) : {accuracy_test_rf}%")
+
+    # Precision
+    precision_test_rf = round(conf_matrix_test_rf[1,1]/(conf_matrix_test_rf[1,1]+conf_matrix_test_rf[0,1])*100,2)
+    print("PRECISION SCORE (Training): ",precision_test_rf,"%")
+
+    # Recall
+    recall_test_rf = round(conf_matrix_test_rf[1,1]/(conf_matrix_test_rf[1,1]+conf_matrix_test_rf[1,0])*100,2)
+    print("RECALL SCORE (Training): ",recall_test_rf,"%")
+
+    # setting seaborn display again (to be applied after this cell execution)
+    sns.set()
+
+    # Calculete the falsepositiverate(fpr), truepositiverate(tpr) for
+    # various thresholds
+    fpr_rf,tpr_rf,thresh_rf = roc_curve(y_testrf,
+                           model.predict_proba(X_testrf)[:,1],
+                           pos_label = 1)
+    # calculate the auc score
+    auc_rf = roc_auc_score(y_testrf,model.predict_proba(X_testrf)[:,1])
+
+    # plot the curve
+    fig, ax = plt.subplots(figsize = (7,5))
+    plt.plot(fpr_rf,tpr_rf)
+    plt.plot([0,1],[0,1], linestyle = "--")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC Curve - Logistic Regression\n (Test Dataset)")
+    plt.fill_between(fpr_rf,tpr_rf, alpha = 0.3)
+    plt.text(0.7,0.5,f"AUC = {round(auc_rf,3)}",fontweight = 700)
+    plt.show()
+
+    # tabular presentation of performances usind pandas dataframe
+
+    data_values = {
+        "Model (Classifier)":["Logistic Regression","Random Forest"],
+        "Accuracy":[accuracy_test_lr,accuracy_test_rf],
+        "Precision":[precision_test_lr,precision_test_rf],
+        "Recall":[recall_test_lr,recall_test_rf],
+        "AUC":[auc_lr,auc_rf]
+    }
+    performance_table = pd.DataFrame(data_values)
+    print(performance_table)
+
+    # visualization of the consolidated performances
+    fig,(ax1,ax2) = plt.subplots(1,2,figsize = (14,5))
+    plt.suptitle("Findings on Performances\n", fontsize = 16)
+    plt.subplots_adjust(wspace = 0.5, top = 0.85)
+
+    # plot for column chart
+    performance_table.plot(kind = "bar",x = "Model (Classifier)",
+                       y = ["Accuracy","Precision","Recall"], ax = ax1)
+    ax1.set_title("Accuracy, Precision & Recall", fontsize = 14)
+    ax1.set_ylabel("Score [%]")
+    ax1.set_xticks(ticks = [0,1], labels = performance_table.iloc[:,0],rotation = 0 )
+    ax1.set_yticks(ticks = range(20,141,20))
+    ax1.legend(loc = "upper right")
+
+    #data labels of "logistic regression"
+    x = -0.2
+    for y in performance_table.iloc[0,1:4]:
+        ax1.text(x,y+5,str(round(y))+"%",horizontalalignment = "center")
+        x = x + 0.2
+    
+    # data labels of "random forest"
+    x = 0.8
+    for y in performance_table.iloc[1,1:4]:
+        ax1.text(x,y+5,str(round(y))+"%",horizontalalignment = "center")
+        x = x + 0.2
+
+
+    # plot the ROC curves of both the models
+    ax2.plot(fpr_rf,tpr_rf)
+    ax2.plot(fpr_lr,tpr_lr)
+    ax2.plot([0,1],[0,1], linestyle = "--")
+    ax2.set_xlabel("False Positive Rate")
+    ax2.set_ylabel("True Positive Rate")
+    ax2.set_title("ROC Curves",fontsize = 14)
+    ax2.fill_between(fpr_rf,tpr_rf, alpha = 0.3)
+    ax2.fill_between(fpr_lr,tpr_lr, alpha = 0.3)
+    ax2.text(0.05,0.9,f"AUC (RF)= {round(auc_rf,3)}", fontweight = 700)
+    ax2.text(0.05,0.5,f"AUC (LR)= {round(auc_lr,3)}", fontweight = 700)
+    plt.show()
+
 

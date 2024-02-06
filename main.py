@@ -201,7 +201,7 @@ print(avg_order_amount_by_customer_type.apply(lambda x: "${:,.2f}".format(x)))
 #top_cities('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
 #Order rejection classification vice
-#order_rejection(df)
+#order_rejection('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 
 #Order rejection classification kaggle
-order_rejection_kaggle('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
+#order_rejection_kaggle('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
