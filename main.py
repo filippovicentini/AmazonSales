@@ -21,7 +21,7 @@ from functions import *
 
 #loading dataset
 df = pd.read_csv('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
+filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 """"
 #initial dataset view
 print(df.head())

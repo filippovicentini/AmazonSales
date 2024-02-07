@@ -1,13 +1,16 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from functions import *
 
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
-
+#df = pd.read_csv(filepath, low_memory = False)
 
 def section_introduction():
     st.title("Amazon Sale Report")
     st.write("In this web application blablabla...")
+    df = df_cleaning_vis_phase(filepath)
+    
 
 
 
@@ -28,7 +31,7 @@ def section_results_conclusions():
     # Aggiungi il codice per visualizzare i risultati e le conclusioni qui
 
 # Barra laterale per la navigazione
-section = st.sidebar.radio("Navigation", ["Dataset Information", "Caricamento dei Dati", "Analisi dei Dati", "Risultati e Conclusioni"])
+section = st.sidebar.selectbox("Navigation", ["Dataset Information", "Caricamento dei Dati", "Analisi dei Dati", "Risultati e Conclusioni"])
 
 # Contenuto principale in base alla sezione selezionata
 if section == "Dataset Information":
