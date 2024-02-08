@@ -205,3 +205,8 @@ print(avg_order_amount_by_customer_type.apply(lambda x: "${:,.2f}".format(x)))
 
 #Order rejection classification kaggle
 #order_rejection_kaggle('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
+
+#df = df_cleaning_vis_phase(filepath)
+#filtered_df = df[(df['product_category'] == 'Blouse') & (df['month'] == 'june')]
+#monthly_quantity = filtered_df.groupby('date')['order_quantity'].sum()
+#print(monthly_quantity)

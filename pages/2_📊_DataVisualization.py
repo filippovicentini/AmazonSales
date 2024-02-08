@@ -12,7 +12,7 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 st.sidebar.title(':arrow_down: Select Chart')
 
 # Widget per mostrare il grafico della net revenue
-show_net_revenue_chart = st.sidebar.radio("Select Chart", ['Amazon Net Revenue', 'Average Monthly Order Amount', 'Top Product Revenue by Month', 'Sales by Product Size', 'Bar Chart: Orders by Product'])
+show_net_revenue_chart = st.sidebar.radio("Select Chart", ['Monthly Order Quantity Trend for Category','Amazon Net Revenue', 'Average Monthly Order Amount', 'Top Product Revenue by Month', 'Sales by Product Size'])
 if show_net_revenue_chart == 'Amazon Net Revenue':
     st.subheader('Amazon Net Revenue', divider='orange')
     amazon_net_revenue_strim(filepath)
@@ -33,14 +33,32 @@ elif show_net_revenue_chart == 'Sales by Product Size':
     interactive_sales_by_product_size(filepath)
 
 # Widget per mostrare il grafico a barre delle orders by product
-elif show_net_revenue_chart == 'Bar Chart: Orders by Product':
-    st.subheader('Bar Chart: Orders by Product', divider='orange')
-    selected_box = st.selectbox('choose', ['1', '2', '3'])
-    if selected_box == '1':
-        st.write('ciao')
-    if selected_box == '2':
-        st.write('no')
-    if selected_box == '3':
-        st.write('si')
+elif show_net_revenue_chart == 'Monthly Order Quantity Trend for Category':
+    selected_category = st.selectbox("Select Product Category", df['product_category'].unique())
+    selected_month = st.selectbox('Select Month',  df['month'].unique())
+    st.subheader(f'Monthly Order Quantity Trend for {selected_category} in {selected_month}', divider='orange')
+
+    # Filtra il DataFrame per la categoria e il mese selezionati
+    filtered_df = df[(df['product_category'] == selected_category) & (df['month'] == selected_month)]
+
+    # Calcola la somma delle quantità degli ordini per ogni mese e categoria
+    monthly_quantity = filtered_df.groupby('date')['order_quantity'].sum().reset_index()
+    #st.write(monthly_quantity)
+    # Esempio di grafico Altair basato sull'andamento delle quantità degli ordini nel tempo per una categoria specifica
+    chart = alt.Chart(monthly_quantity).mark_line(color='#1e90ff').encode(
+        x='date:T',
+        y='order_quantity:Q',
+        tooltip=['date:T', 'order_quantity:Q']
+    ).properties(
+        width=800,
+        height=500,
+        #title=f'Monthly Order Quantity Trend for Category: {selected_category} in {selected_month}'
+    )
+
+    # Visualizza il grafico Altair
+    st.altair_chart(chart, use_container_width=True)
+
+
+
 
 
