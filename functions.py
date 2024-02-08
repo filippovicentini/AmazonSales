@@ -1439,6 +1439,69 @@ def order_rejection_kaggle(filepath):
     ax2.text(0.05,0.5,f"AUC (LR)= {round(auc_lr,3)}", fontweight = 700)
     plt.show()
 
+def plot_class_distr(y_train):
+    # bar chvalue_countsg matplotlib package
+    fig,ax = plt.subplots(figsize = (7,5))
+
+    # calculate and store the proportion values in y_train series
+    plot_dataseries = round(y_train.value_counts(normalize = True)*100,2) 
+
+    # plot the bar chart
+    plot_dataseries.plot(kind = "bar",ax =ax, color = "navy")
+    #plt.text(0.5,70,"Imbalanced Class Dataset",color = "darkred",
+            #horizontalalignment = "center",fontsize = 14)
+    plt.axhline(y = plot_dataseries[0],color = "darkred", linestyle = "--")
+    plt.title("Class Proportions of y_train", fontsize = 16)
+    plt.ylabel("Proportion", fontsize = 12)
+    plt.xlabel("Status", fontsize = 12)
+    plt.xticks(ticks = range(len(plot_dataseries)),
+            labels = ["Not Rejected", "Rejected"], rotation = "horizontal")
+    plt.yticks(ticks = [20,40,60,80,100], labels = ["20%","40%","60%","80%","100%"])
+
+    # create another series with values to be diaplayed as data-label/value-label in the chart
+    data_label = plot_dataseries.astype(str).str.cat(np.full((2,),"%"), sep = "")
+
+    # add/plot the data-label (in%) in the chart
+    for x,y in enumerate(plot_dataseries):
+        plt.text(x,y-7,data_label[x],color = "white",
+                fontweight = 700,fontsize = 13, horizontalalignment = "center")
+
+    # add/plot the data-label (in count) in the chart
+    for x,y in enumerate(y_train.value_counts()):
+        plt.text(x,plot_dataseries[x]- 13,f"Count:{y_train.value_counts()[x]}",
+                horizontalalignment = "center", color = "lightpink",fontsize = 12, fontweight = 700)
+
+
+    st.pyplot(fig)
+
+def confusion_matrix_logistic(X, y):
+    num_transformer = make_pipeline(SimpleImputer(),MinMaxScaler())
+    cat_transformer = make_pipeline(SimpleImputer(strategy = "most_frequent"),OneHotEncoder(drop = "first"))
+    col_transformer = ColumnTransformer(
+        [
+            ("numtransformer",num_transformer,
+            X.select_dtypes(exclude = "object").columns),
+            ("cattransformer",cat_transformer,X.select_dtypes(include = "object").columns)
+        ]
+    )
+    logistic_model = make_pipeline(
+        col_transformer,
+        LogisticRegression(random_state = 42, max_iter = 1000)
+    )
+    logistic_model.fit(X,y)
+    y_pred = logistic_model.predict(X)
+    confusion = confusion_matrix(y, y_pred)
+    fig, ax = plt.subplots(figsize=(2,2),dpi=100)
+    ConfusionMatrixDisplay.from_estimator(logistic_model, X, y, ax=ax, colorbar=False)
+    plt.title("Confusion Matrix - (Logistic Regression Classifier)")
+    st.pyplot(fig,use_container_width=False)
+    accuracy = round(logistic_model.score(X, y) * 100, 2)
+    precision = round(confusion[1, 1] / (confusion[1, 1] + confusion[0, 1]) * 100, 2)
+    recall = round(confusion[1, 1] / (confusion[1, 1] + confusion[1, 0]) * 100, 2)
+    st.write(f"ACCURACY SCORE (Training): {accuracy}%")
+    st.write(f"PRECISION SCORE (Training): {precision}%")
+    st.write(f"RECALL SCORE (Training): {recall}%")
+    sns.set()
 
 
 
