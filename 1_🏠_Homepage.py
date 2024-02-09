@@ -65,34 +65,10 @@ else:
     })
     st.table(columns_info)
 
-
-# Widget di input per inserire l'Order ID nella barra laterale
-order_id_input = st.sidebar.text_input("Enter Order ID:", "")
-
 # Mostra le informazioni corrispondenti all'Order ID inserito
-if df_choice == 'Original':
-    if order_id_input:
-        try:
-            selected_row = no_cleaning_df[no_cleaning_df['Order ID'] == order_id_input]
-            if not selected_row.empty:
-                st.sidebar.subheader(f"Details for Order ID: {order_id_input}")
-
-                # Seleziona solo le colonne desiderate
-                selected_info = selected_row[['date', 'product_category',
-                                              'size', 'courier_ship_status', 'order_quantity',
-                                              'order_amount_($)', 'city', 'state']]
-
-                # Formatta le informazioni come una lista di stringhe
-                formatted_info = [f"{col}: {value}" for col, value in selected_info.to_dict(orient='records')[0].items()]
-
-                # Mostra le informazioni nella barra laterale
-                for info in formatted_info:
-                    st.sidebar.text(info)
-            else:
-                st.sidebar.warning("No details found for the provided Order ID.")
-        except ValueError:
-            st.sidebar.warning("Please enter a valid Order ID.")
-else:
+if df_choice == 'Cleaned':
+    # Widget di input per inserire l'Order ID nella barra laterale
+    order_id_input = st.sidebar.text_input("Enter Order ID:", "")
     if order_id_input:
         try:
             selected_row = df[df['order_ID'] == order_id_input]

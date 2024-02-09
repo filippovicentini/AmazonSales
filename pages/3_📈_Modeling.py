@@ -53,6 +53,8 @@ if choose_model == 'Logistic Regression':
         confusion_matrix_logistic(X_train_over,y_train_over)
     if choose_graph == 'Confusion Matrix Test':
         confusion_matrix_logistic(X_test, y_test)
+    if choose_graph == 'ROC Curve':
+        roc_curve_logistic(X_test, y_test)
 
 
 

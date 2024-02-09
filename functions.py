@@ -17,6 +17,8 @@ from sklearn.model_selection import GridSearchCV,train_test_split
 from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay,roc_curve,roc_auc_score,auc
 from sklearn.metrics import precision_score, recall_score, accuracy_score
 from sklearn import set_config
+import altair as alt
+
 set_config(display = "diagram")  
 
 #this function shows with a graphic the distribution of NaN values in the dataset
@@ -1490,18 +1492,73 @@ def confusion_matrix_logistic(X, y):
     )
     logistic_model.fit(X,y)
     y_pred = logistic_model.predict(X)
+
+    #confusion = confusion_matrix(y, y_pred)
+    #fig, ax = plt.subplots(figsize=(2,2),dpi=100)
+    #ConfusionMatrixDisplay.from_estimator(logistic_model, X, y, ax=ax, colorbar=False)
+    #plt.title("Confusion Matrix - (Logistic Regression Classifier)")
+    #st.pyplot(fig,use_container_width=False)
+
     confusion = confusion_matrix(y, y_pred)
-    fig, ax = plt.subplots(figsize=(2,2),dpi=100)
-    ConfusionMatrixDisplay.from_estimator(logistic_model, X, y, ax=ax, colorbar=False)
-    plt.title("Confusion Matrix - (Logistic Regression Classifier)")
-    st.pyplot(fig,use_container_width=False)
+    
+    fig,ax = plt.subplots(figsize = (5,5))
+    ConfusionMatrixDisplay.from_estimator(logistic_model, X, y, ax=ax, colorbar=False,)
+    st.pyplot(fig)
+
     accuracy = round(logistic_model.score(X, y) * 100, 2)
     precision = round(confusion[1, 1] / (confusion[1, 1] + confusion[0, 1]) * 100, 2)
     recall = round(confusion[1, 1] / (confusion[1, 1] + confusion[1, 0]) * 100, 2)
-    st.write(f"ACCURACY SCORE (Training): {accuracy}%")
-    st.write(f"PRECISION SCORE (Training): {precision}%")
-    st.write(f"RECALL SCORE (Training): {recall}%")
-    sns.set()
+
+    st.sidebar.info(f"Model Evaluation Metrics:\n"
+                 f"  - Accuracy Score: {accuracy}%\n"
+                 f"  - Precision Score: {precision}%\n"
+                 f"  - Recall Score: {recall}%")
 
 
+def roc_curve_logistic(X, y):
+    num_transformer = make_pipeline(SimpleImputer(), MinMaxScaler())
+    cat_transformer = make_pipeline(SimpleImputer(strategy="most_frequent"), OneHotEncoder(drop="first"))
+    col_transformer = ColumnTransformer(
+        [
+            ("numtransformer", num_transformer, X.select_dtypes(exclude="object").columns),
+            ("cattransformer", cat_transformer, X.select_dtypes(include="object").columns)
+        ]
+    )
+    logistic_model = make_pipeline(
+        col_transformer,
+        LogisticRegression(random_state=42, max_iter=1000)
+    )
+    logistic_model.fit(X, y)
+    y_pred = logistic_model.predict(X)
+    fpr_lr, tpr_lr, thresh_lr = roc_curve(y, logistic_model.predict_proba(X)[:, 1], pos_label=1)
 
+    auc_lr = roc_auc_score(y, logistic_model.predict_proba(X)[:, 1])
+
+    data = pd.DataFrame({
+        'False Positive Rate': fpr_lr,
+        'True Positive Rate': tpr_lr
+    })
+
+    # Crea un grafico ROC Curve con area sottesa evidenziata
+    chart = alt.Chart(data).mark_area(opacity=0.3, interpolate='step').encode(
+        x='False Positive Rate',
+        y='True Positive Rate'
+    )
+
+    # Aggiungi la curva ROC al grafico
+    line = alt.Chart(data).mark_line(color='#87ceeb').encode(
+        x='False Positive Rate',
+        y='True Positive Rate'
+    )
+
+    # Aggiungi la retta y=x al grafico
+    baseline = alt.Chart(pd.DataFrame({'x': [0, 1], 'y': [0, 1]})).mark_line(color='red', strokeDash=[5, 5]).encode(
+        x='x',
+        y='y'
+    )
+
+    chart = chart + line + baseline
+
+    st.altair_chart(chart, use_container_width=True)
+
+    st.sidebar.info(f"AUC = {round(auc_lr, 3)}")
