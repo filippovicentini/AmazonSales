@@ -8,35 +8,32 @@ df = df_cleaning_vis_phase(filepath)
 st.title(':blue[Data] :orange[Visualization] :bar_chart:')
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-# Barra laterale per i widget fissi in alto
-st.sidebar.title(':arrow_down: Select Chart')
-
 # Widget per mostrare il grafico della net revenue
-show_net_revenue_chart = st.sidebar.radio("Select Chart", ['Monthly Order Quantity Trend for Category','Amazon Net Revenue', 'Average Monthly Order Amount', 'Top Product Revenue by Month', 'Sales by Product Size'])
+show_net_revenue_chart = st.sidebar.radio('Select Chart :arrow_down:', ['Monthly Order Quantity Trend for Category','Amazon Net Revenue', 'Average Monthly Order Amount', 'Top Product Revenue by Month', 'Sales by Product Size'])
 if show_net_revenue_chart == 'Amazon Net Revenue':
-    st.subheader('Amazon Net Revenue', divider='orange')
+    st.subheader(':blue[Amazon Net Revenue]', divider='orange')
     amazon_net_revenue_strim(filepath)
 
 # Widget per mostrare il grafico dell'average monthly order amount
 elif show_net_revenue_chart == 'Average Monthly Order Amount':
-    st.subheader('Average Monthly Order Amount', divider='orange')
+    st.subheader(':blue[Average Monthly Order Amount]', divider='orange')
     interactive_average_monthly_order_amount(filepath)
 
 # Widget per mostrare il grafico del top product revenue by month
 elif show_net_revenue_chart == 'Top Product Revenue by Month':
-    st.subheader('Top Product Revenue by Month', divider='orange')
+    st.subheader(':blue[Top Product Revenue by Month]', divider='orange')
     interactive_top_product_revenue_by_month(filepath)
 
 # Widget per mostrare il grafico delle sales by product size
 elif show_net_revenue_chart == 'Sales by Product Size':
-    st.subheader('Sales by Product Size', divider='orange')
+    st.subheader(':blue[Sales by Product Size]', divider='orange')
     interactive_sales_by_product_size(filepath)
 
 # Widget per mostrare il grafico a barre delle orders by product
 elif show_net_revenue_chart == 'Monthly Order Quantity Trend for Category':
     selected_category = st.selectbox("Select Product Category", df['product_category'].unique())
     selected_month = st.selectbox('Select Month',  df['month'].unique())
-    st.subheader(f'Monthly Order Quantity Trend for {selected_category} in {selected_month}', divider='orange')
+    st.subheader(f':blue[Monthly Order Quantity Trend for {selected_category} in {selected_month}]', divider='orange')
 
     # Filtra il DataFrame per la categoria e il mese selezionati
     filtered_df = df[(df['product_category'] == selected_category) & (df['month'] == selected_month)]

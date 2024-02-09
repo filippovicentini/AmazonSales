@@ -13,7 +13,9 @@ st.sidebar.success('Select a page above', icon='⬆️')
 
 # Testo descrittivo con formattazione Markdown
 st.markdown("""
-In this web app, we analyze the **Amazon Sale Report** dataset downloaded from Kaggle. The dataset provides information on Amazon sales in India that occurred in April, May, and June. Let's explore the data to derive insights and predictions! :bar_chart:""")
+In this web app, we analyze the **Amazon Sale Report** dataset downloaded from Kaggle. 
+The dataset provides information on Amazon sales in India that occurred in April, May, and June. 
+Let's explore the data to derive insights and predictions! :bar_chart:""")
 
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 no_cleaning_df = pd.read_csv(filepath, low_memory = False)
