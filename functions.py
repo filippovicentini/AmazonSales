@@ -977,3 +977,93 @@ def confusion_matrix_forest2(filepath):
     plt.fill_between(fpr_rf,tpr_rf, alpha = 0.3)
     plt.text(0.7,0.5,f"AUC = {round(auc_rf,3)}",fontweight = 700)
     st.pyplot(fig)
+
+def logistic_and_forest(filepath, size):
+    df = df_cleaning_modeling_phase(filepath)
+    df['amount'].fillna(0,inplace=True)
+    target = "rejected"
+    y = df[target]     # target vector
+    X = df.drop(target, axis = "columns")   # feature matrix/dataframe
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = size, random_state = 42)
+    # resample it (training dataset) using Random Over Sampling
+    ros = RandomOverSampler(random_state = 42)
+    X_train_over,y_train_over = ros.fit_resample(X_train, y_train)
+    #LOGISTIC REGRESSION
+    num_transformer = make_pipeline(SimpleImputer(),MinMaxScaler())
+    cat_transformer = make_pipeline(SimpleImputer(strategy = "most_frequent"),OneHotEncoder(drop = "first"))
+    col_transformer = ColumnTransformer(
+            [
+                ("numtransformer",num_transformer,
+                X_train_over.select_dtypes(exclude = "object").columns),
+                ("cattransformer",cat_transformer,X_train_over.select_dtypes(include = "object").columns)
+            ]
+    )
+    logistic_model = make_pipeline(
+            col_transformer,
+            LogisticRegression(random_state = 42, max_iter = 1000)
+    )
+    logistic_model.fit(X_train_over,y_train_over)
+
+    #training
+    y_train_over_pred_lr = logistic_model.predict(X_train_over)
+    confusion_train_lr = confusion_matrix(y_train_over, y_train_over_pred_lr)
+    accuracy_train_lg = round(logistic_model.score(X_train_over,y_train_over)*100,2)
+    precision_train_lg = round(confusion_train_lr[1,1]/(confusion_train_lr[1,1]+confusion_train_lr[0,1])*100,2)
+    recall_train_lg = round(confusion_train_lr[1,1]/(confusion_train_lr[1,1]+confusion_train_lr[1,0])*100,2)
+
+    #test
+    y_test_pred_lr = logistic_model.predict(X_test)
+    confusion_test_lr = confusion_matrix(y_test,y_test_pred_lr)
+    accuracy_test_lg = round(logistic_model.score(X_test,y_test)*100,2)
+    precision_test_lg = round(confusion_test_lr[1,1]/(confusion_test_lr[1,1]+confusion_test_lr[0,1])*100,2)
+    recall_test_lg = round(confusion_test_lr[1,1]/(confusion_test_lr[1,1]+confusion_test_lr[1,0])*100,2)
+
+    #roc curve
+    fpr_lr,tpr_lr,thresh_lr = roc_curve(y_test,
+                                logistic_model.predict_proba(X_test)[:,1],
+                                pos_label = 1)
+    auc_lr = roc_auc_score(y_test,logistic_model.predict_proba(X_test)[:,1])
+
+    #futures importance
+    # coefficients/weights list
+    weights_list = logistic_model.named_steps["logisticregression"].coef_.reshape(-1,)
+    # features list
+    features_list_lr = list(logistic_model["columntransformer"].transformers_[1][1]["onehotencoder"]
+                    .get_feature_names_out())
+    features_list_lr.insert(0,"amount")
+    #create the pandas series
+    feature_importances_lr = pd.Series(weights_list,index = features_list_lr)
+    # sort values based on weights 
+    feature_importances_lr = feature_importances_lr.sort_values(key = abs)
+
+    #RANDOM FOREST
+    X_encoded = pd.get_dummies(X)
+    X_trainrf, X_testrf, y_trainrf, y_testrf = train_test_split(X_encoded, y, test_size=size, random_state=42)
+    model = RandomForestClassifier()
+    model.fit(X_trainrf, y_trainrf)
+
+    #training
+    y_train_predrf = model.predict(X_trainrf)
+    conf_matrix_train_rf = confusion_matrix(y_trainrf, y_train_predrf)
+    accuracy_train_rf = round(model.score(X_trainrf,y_trainrf)*100,2)
+    precision_train_rf = round(conf_matrix_train_rf[1,1]/(conf_matrix_train_rf[1,1]+conf_matrix_train_rf[0,1])*100,2)
+    recall_train_rf = round(conf_matrix_train_rf[1,1]/(conf_matrix_train_rf[1,1]+conf_matrix_train_rf[1,0])*100,2)
+
+    #test
+    y_test_predrf = model.predict(X_testrf)
+    conf_matrix_test_rf = confusion_matrix(y_testrf, y_test_predrf)
+    accuracy_test_rf = round(model.score(X_testrf,y_testrf)*100,2)
+    precision_test_rf = round(conf_matrix_test_rf[1,1]/(conf_matrix_test_rf[1,1]+conf_matrix_test_rf[0,1])*100,2)
+    recall_test_rf = round(conf_matrix_test_rf[1,1]/(conf_matrix_test_rf[1,1]+conf_matrix_test_rf[1,0])*100,2)
+
+    #roc curve
+    fpr_rf,tpr_rf,thresh_rf = roc_curve(y_testrf,
+                            model.predict_proba(X_testrf)[:,1],
+                            pos_label = 1)
+    auc_rf = roc_auc_score(y_testrf,model.predict_proba(X_testrf)[:,1])
+
+    # Feature Importance
+    feature_importances_rf = pd.Series(model.feature_importances_, index=X_encoded.columns)
+    feature_importances_rf = feature_importances_rf.sort_values(ascending=True)
+
+    return accuracy_test_lg, precision_test_lg, recall_test_lg, auc_lr, fpr_lr, tpr_lr, feature_importances_lr, accuracy_test_rf, precision_test_rf, recall_test_rf, auc_rf, fpr_rf, tpr_rf, feature_importances_rf
