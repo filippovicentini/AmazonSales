@@ -4,7 +4,7 @@ import plotly.express as px
 
 
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
-st.title(':blue[Findings and] :orange[Discussions]')
+st.title(':blue[Findings and] :orange[Discussions] 🔍')
 
 accuracy_test_lg, precision_test_lg, recall_test_lg, auc_lr, fpr_lr, tpr_lr, feature_importance_lr, accuracy_test_rf, precision_test_rf, recall_test_rf, auc_rf, fpr_rf, tpr_rf, feature_importance_rf = logistic_and_forest(filepath, 0.2)
 
@@ -67,7 +67,7 @@ st.markdown('Also, we may conclude that the important features impacting the dec
 
 col1, col2 = st.columns(2)
 
-col1.subheader(':blue[Logistic] :orange[Regression]')
+col1.caption(':blue[Logistic] :orange[Regression]')
 fig, ax = plt.subplots(figsize = (7,5))
 #plt.subplots_adjust(hspace = 0.5)
 feature_importance_lr.tail(10).plot(kind = "barh", ax = ax)
@@ -76,7 +76,7 @@ plt.ylabel("Features", fontsize = 12)
 col1.pyplot(fig)
 
 
-col2.subheader(':blue[Random] :orange[Forest]')
+col2.caption(':blue[Random] :orange[Forest]')
  # plot top 10 select_dtypesbottom 10 important features
 fig, ax = plt.subplots(figsize = (7,5))
 #plt.subplots_adjust(hspace = 0.5)

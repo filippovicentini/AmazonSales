@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 from functions import *
+import datetime
+
 
 st.set_page_config(
     page_title='Amazon Sale Report',
@@ -9,7 +11,6 @@ st.set_page_config(
 
 # Impostare il colore del titolo su blu e arancione
 st.title(':blue[Amazon] :orange[Sale] :blue[Report] :truck:')
-st.sidebar.success('Select a page above', icon='⬆️')
 
 # Testo descrittivo con formattazione Markdown
 st.markdown("""
@@ -70,28 +71,63 @@ else:
 # Mostra le informazioni corrispondenti all'Order ID inserito
 if df_choice == 'Cleaned':
     # Widget di input per inserire l'Order ID nella barra laterale
-    order_id_input = st.sidebar.text_input("Enter Order ID:", "")
-    if order_id_input:
-        try:
-            selected_row = df[df['order_ID'] == order_id_input]
-            if not selected_row.empty:
-                st.sidebar.subheader(f"Details for Order ID: {order_id_input}")
+    remember_or_not = st.sidebar.radio('Do you remember your order ID?', ['Yes', 'No'], horizontal=True, index=None)
+    if remember_or_not == 'Yes':
+        order_id_input = st.sidebar.text_input("Enter Order ID:", "")
+        if order_id_input:
+            try:
+                selected_row = df[df['order_ID'] == order_id_input]
+                if not selected_row.empty:
+                    st.sidebar.subheader(f"Details for Order ID: {order_id_input}")
 
-                # Seleziona solo le colonne desiderate
-                selected_info = selected_row[['date', 'product_category',
-                                              'size', 'courier_ship_status', 'order_quantity',
-                                              'order_amount_($)', 'city', 'state']]
+                    # Seleziona solo le colonne desiderate
+                    selected_info = selected_row[['date', 'product_category',
+                                                'size', 'courier_ship_status', 'order_quantity',
+                                                'order_amount_($)', 'city', 'state']]
 
-                # Formatta le informazioni come una lista di stringhe
-                formatted_info = [f"{col}: {value}" for col, value in selected_info.to_dict(orient='records')[0].items()]
+                    # Formatta le informazioni come una lista di stringhe
+                    formatted_info = [f"{col}: {value}" for col, value in selected_info.to_dict(orient='records')[0].items()]
 
-                # Mostra le informazioni nella barra laterale
-                for info in formatted_info:
-                    st.sidebar.text(info)
-            else:
-                st.sidebar.warning("No details found for the provided Order ID.")
-        except ValueError:
-            st.sidebar.warning("Please enter a valid Order ID.")
+                    # Mostra le informazioni nella barra laterale
+                    for info in formatted_info:
+                        st.sidebar.text(info)
+                else:
+                    st.sidebar.warning("No details found for the provided Order ID.")
+            except ValueError:
+                st.sidebar.warning("Please enter a valid Order ID.")
+    if remember_or_not == 'No':
+        st.sidebar.info('We can try to find it')
+        date_order = st.sidebar.date_input('Date of the order', datetime.date(2022,4,30))
+        date_order = pd.to_datetime(date_order, format='%m-%d-%y')
+        category_product = st.sidebar.selectbox('Category of the product', df['product_category'].unique(), index=None)
+        size_product = st.sidebar.selectbox('Size of the product', df['size'].unique(), index=None)
+        city_product = st.sidebar.text_input('City of the product', placeholder='MUMBAI')
+        zip_product = st.sidebar.text_input('ZIP of the product', placeholder='400081.0')
+        selected_row2 = df[(df['date'] == date_order) & (df['product_category'] == category_product)
+                    & (df['size'] == size_product) & (df['city'] == city_product)
+                    & (df['zip'] == zip_product)]
+        # Pulsanti
+        show_info_button = st.sidebar.button("Show Info")
 
+        if show_info_button:
+            try:
+                if not selected_row2.empty:
+                    st.subheader(f"Details for Order ID: {selected_row2['order_ID']}")
+
+                    # Seleziona solo le colonne desiderate
+                    selected_info2 = selected_row2[['date', 'product_category',
+                                                    'size', 'courier_ship_status', 'order_quantity',
+                                                    'order_amount_($)', 'city', 'state']]
+
+                    # Formatta le informazioni come una lista di stringhe
+                    formatted_info2 = [f"{col}: {value}" for col, value in selected_info2.to_dict(orient='records')[0].items()]
+
+                    # Mostra le informazioni nella barra laterale
+                    for info in formatted_info2:
+                        st.text(info)
+                else:
+                    st.warning("No details found.")
+            except ValueError:
+                st.warning("Please, revision your selections.")
 
 
