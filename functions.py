@@ -178,10 +178,14 @@ def interactive_top_product_revenue_by_month(filepath):
     num_y_ticks = 10
 
     # Calcolo dei valori tick y
-    y_tick_values = np.linspace(ax.get_yticks()[0], ax.get_yticks()[-1], num_y_ticks)
+    max_y_value = sales_by_month['order_amount_($)'].max()
+    min_y_value = 0  # Puoi impostare il valore minimo in base ai tuoi dati
+
+    # Calcolo dei valori tonde degli y ticks
+    rounded_y_ticks = np.linspace(min_y_value, max_y_value, num_y_ticks).round(-4)
 
     # Impostazione dei tick y
-    ax.set_yticks(y_tick_values)
+    ax.set_yticks(rounded_y_ticks)
 
     # Aggiunta titolo e etichette degli assi
     #ax.set_title('Top Product Revenue by Month', fontsize=20, x=.22, y=1.07)
@@ -190,8 +194,8 @@ def interactive_top_product_revenue_by_month(filepath):
     plt.legend(bbox_to_anchor=(1, 1), fontsize=12, framealpha=1)
 
     ax.set_xlabel(None)
-    ax.set_ylabel('Net Revenue in 10,000 dollars', fontsize=12, labelpad=3)
-    ax.set_yticklabels(list(range(0, 46, 5)))
+    ax.set_ylabel('Net Revenue', fontsize=12, labelpad=3)
+    #ax.set_yticklabels(list(range(0, 46, 5)))
     ax.yaxis.grid(linestyle='--', color='gray', linewidth=0.5, dashes=(8, 5))
 
     ax.tick_params(axis='both', labelsize=12)
@@ -245,6 +249,50 @@ def interactive_sales_by_product_size(filepath):
     for i, size in enumerate(sales_by_size.index):
         if size in ['S', 'M', 'L']:
             ax.text(i, sales_by_size.values[i], f'{sales_by_size.values[i]/10000:.0f}k', ha='center', fontsize=14, fontweight='bold', color='black')
+
+    # Removing top and right spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_linewidth(2)
+    ax.spines['bottom'].set_color('black')
+
+    # Using Streamlit to display the plot
+    st.pyplot(fig)
+
+def interactive_quantity_size(filepath):
+    # Cleaning the DataFrame
+    df = df_cleaning_vis_phase(filepath)
+
+    # Grouping data by product size and calculating total sales
+    sales_by_size = df.groupby('size')['order_quantity'].sum()
+
+    # Creating a horizontal bar chart to show sales by product size
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Using a color palette to highlight specific sizes
+    palette_colors = ['orange' if size in ['S', 'M', 'L'] else '#1e90ff' for size in sales_by_size.index]
+    sns.barplot(x=sales_by_size.index, y=sales_by_size.values, ax=ax, palette=palette_colors)
+
+    # Setting font sizes for x and y labels, title, and ticks
+    ax.set_xlabel('Product Size', labelpad=3, fontsize=14)
+    ax.set_ylabel('Quantity', labelpad=3, fontsize=14)
+    #ax.set_yticklabels(list(range(0, 20, 2)))
+    #ax.set_title('Sales by Product Size', fontsize=20, x=0.085, y=1.05, pad=10)
+    #ax.text(-0.06, 1.04, 'Q2 FY22', fontsize=15, color='#878787', transform=ax.transAxes)
+
+    ax.tick_params(axis='both', labelsize=12)
+    ax.yaxis.grid(linestyle='--', color='gray', linewidth=0.5, dashes=(8, 5))
+    ax.xaxis.grid(False)
+
+    # Setting the number of y ticks desired
+    num_y_ticks = 10
+
+    # Calculating the y tick values
+    y_tick_values = np.linspace(ax.get_yticks()[0], ax.get_yticks()[-1], num_y_ticks)
+
+    # Setting the y ticks
+    ax.set_yticks(y_tick_values)
 
     # Removing top and right spines
     ax.spines['top'].set_visible(False)

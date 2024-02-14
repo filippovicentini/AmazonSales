@@ -139,7 +139,7 @@ st.subheader(':blue[Process] :orange[Data]', divider='orange')
 choose_model = st.radio('Select the Model',['Logistic Regression','Random Forest'],
                         index=None, horizontal=True)
 
-choose_graph = st.radio('Choose the graph', ['Confusion Matrix Training', 'Confusion Matrix Test','ROC Curve', 'Top 10 Futures'],
+choose_graph = st.radio('Choose the graph', ['Confusion Matrix Training', 'Confusion Matrix Test','ROC Curve', 'Top 10 Features'],
                         index=None,horizontal=True)
 
 if choose_model == 'Logistic Regression':
@@ -187,7 +187,7 @@ if choose_model == 'Logistic Regression':
 
         st.altair_chart(chart, use_container_width=True)
         st.sidebar.metric(label='AUC', value=round(auc_lr,3))
-    if choose_graph == 'Top 10 Futures':
+    if choose_graph == 'Top 10 Features':
         # plot top 10 select_dtypesbottom 10 important features
         fig, ax = plt.subplots(figsize = (7,5))
         #plt.subplots_adjust(hspace = 0.5)
@@ -243,7 +243,7 @@ if choose_model == 'Random Forest':
         st.altair_chart(chart, use_container_width=True)
         st.sidebar.metric(label='AUC', value=round(auc_rf,3))
 
-    if choose_graph == 'Top 10 Futures':
+    if choose_graph == 'Top 10 Features':
         # plot top 10 select_dtypesbottom 10 important features
         fig, ax = plt.subplots(figsize = (7,5))
         #plt.subplots_adjust(hspace = 0.5)
