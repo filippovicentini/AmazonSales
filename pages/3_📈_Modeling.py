@@ -116,6 +116,22 @@ auc_rf = roc_auc_score(y_testrf,model.predict_proba(X_testrf)[:,1])
 feature_importances_rf = pd.Series(model.feature_importances_, index=X_encoded.columns)
 feature_importances_rf = feature_importances_rf.sort_values(ascending=True)
 
+#GAUSSIAN
+#gaus = GaussianNB()
+#gaus.fit(X_trainrf, y_trainrf)
+#y_pred_gaus = model.predict(X_testrf)
+#conf_matrix_test_gaus = confusion_matrix(y_testrf, y_pred_gaus)
+#accuracy_test_gaus = round(gaus.score(X_testrf,y_testrf)*100,2)
+#precision_test_gaus = round(conf_matrix_test_gaus[1,1]/(conf_matrix_test_gaus[1,1]+conf_matrix_test_gaus[0,1])*100,2)
+#recall_test_gaus = round(conf_matrix_test_gaus[1,1]/(conf_matrix_test_gaus[1,1]+conf_matrix_test_gaus[1,0])*100,2)
+#fig,ax = plt.subplots(figsize = (5,5))
+#ConfusionMatrixDisplay.from_estimator(gaus,X_testrf,y_testrf,
+                                        #ax = ax, colorbar=False)
+#st.pyplot(fig)
+#st.sidebar.info(f"Model Evaluation Metrics:\n"
+                #f"  - Accuracy Score: {accuracy_test_gaus}%\n"
+                #f"  - Precision Score: {precision_test_gaus}%\n"
+                #f"  - Recall Score: {recall_test_gaus}%")
 #VISUALIZATION
 
 st.subheader(':blue[Process] :orange[Data]', divider='orange')
@@ -132,19 +148,17 @@ if choose_model == 'Logistic Regression':
         ConfusionMatrixDisplay.from_estimator(logistic_model,X_train_over,y_train_over,
                                         ax = ax, colorbar=False)
         st.pyplot(fig)
-        st.sidebar.info(f"Model Evaluation Metrics:\n"
-                 f"  - Accuracy Score: {accuracy_train_lg}%\n"
-                 f"  - Precision Score: {precision_train_lg}%\n"
-                 f"  - Recall Score: {recall_train_lg}%")
+        st.sidebar.metric(label='Accuracy Score', value=accuracy_train_lg)
+        st.sidebar.metric(label='Precision Score', value=precision_train_lg)
+        st.sidebar.metric(label='Recall Score', value=recall_train_lg)
     if choose_graph == 'Confusion Matrix Test':
         fig,ax = plt.subplots(figsize = (5,5))
         ConfusionMatrixDisplay.from_estimator(logistic_model,X_test,y_test,
                                         ax = ax, colorbar=False)
         st.pyplot(fig)
-        st.sidebar.info(f"Model Evaluation Metrics:\n"
-                 f"  - Accuracy Score: {accuracy_test_lg}%\n"
-                 f"  - Precision Score: {precision_test_lg}%\n"
-                 f"  - Recall Score: {recall_test_lg}%")
+        st.sidebar.metric(label='Accuracy Score', value=accuracy_test_lg)
+        st.sidebar.metric(label='Precision Score', value=precision_test_lg)
+        st.sidebar.metric(label='Recall Score', value=recall_test_lg)
     if choose_graph == 'ROC Curve':
         data = pd.DataFrame({
         'False Positive Rate': fpr_lr,
@@ -172,9 +186,7 @@ if choose_model == 'Logistic Regression':
         chart = chart + line + baseline
 
         st.altair_chart(chart, use_container_width=True)
-
-        st.sidebar.info(f"AUC = {round(auc_lr, 3)}")
-
+        st.sidebar.metric(label='AUC', value=round(auc_lr,3))
     if choose_graph == 'Top 10 Futures':
         # plot top 10 select_dtypesbottom 10 important features
         fig, ax = plt.subplots(figsize = (7,5))
@@ -191,19 +203,17 @@ if choose_model == 'Random Forest':
         ConfusionMatrixDisplay.from_estimator(model,X_trainrf,y_trainrf,
                                         ax = ax, colorbar=False)
         st.pyplot(fig)
-        st.sidebar.info(f"Model Evaluation Metrics:\n"
-                 f"  - Accuracy Score: {accuracy_train_rf}%\n"
-                 f"  - Precision Score: {precision_train_rf}%\n"
-                 f"  - Recall Score: {recall_train_rf}%")
+        st.sidebar.metric(label='Accuracy Score', value=accuracy_train_rf)
+        st.sidebar.metric(label='Precision Score', value=precision_train_rf)
+        st.sidebar.metric(label='Recall Score', value=recall_train_rf)
     if choose_graph == 'Confusion Matrix Test':
         fig,ax = plt.subplots(figsize = (5,5))
         ConfusionMatrixDisplay.from_estimator(model,X_testrf,y_testrf,
                                         ax = ax, colorbar=False)
         st.pyplot(fig)
-        st.sidebar.info(f"Model Evaluation Metrics:\n"
-                 f"  - Accuracy Score: {accuracy_test_rf}%\n"
-                 f"  - Precision Score: {precision_test_rf}%\n"
-                 f"  - Recall Score: {recall_test_rf}%")
+        st.sidebar.metric(label='Accuracy Score', value=accuracy_test_rf)
+        st.sidebar.metric(label='Precision Score', value=precision_test_rf)
+        st.sidebar.metric(label='Recall Score', value=recall_test_rf)
     if choose_graph == 'ROC Curve':
         data = pd.DataFrame({
         'False Positive Rate': fpr_rf,
@@ -231,8 +241,7 @@ if choose_model == 'Random Forest':
         chart = chart + line + baseline
 
         st.altair_chart(chart, use_container_width=True)
-
-        st.sidebar.info(f"AUC = {round(auc_rf, 3)}")
+        st.sidebar.metric(label='AUC', value=round(auc_rf,3))
 
     if choose_graph == 'Top 10 Futures':
         # plot top 10 select_dtypesbottom 10 important features

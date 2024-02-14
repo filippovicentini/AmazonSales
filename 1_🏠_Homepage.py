@@ -6,7 +6,7 @@ import datetime
 
 st.set_page_config(
     page_title='Amazon Sale Report',
-    page_icon=':truck:'
+    page_icon=':truck:',
 )
 
 # Impostare il colore del titolo su blu e arancione
@@ -125,6 +125,7 @@ if df_choice == 'Cleaned':
                     # Mostra le informazioni nella barra laterale
                     for info in formatted_info2:
                         st.text(info)
+                    st.balloons()
                 else:
                     st.warning("No details found.")
             except ValueError:

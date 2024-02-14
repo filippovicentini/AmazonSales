@@ -1,7 +1,6 @@
 #libraries
 import pandas as pd
 import numpy as np
-import os 
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
@@ -19,6 +18,7 @@ from sklearn.metrics import precision_score, recall_score, accuracy_score
 from sklearn import set_config
 import altair as alt
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.naive_bayes import GaussianNB
 
 set_config(display = "diagram")  
 
