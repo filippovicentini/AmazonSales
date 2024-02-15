@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from functions import *
 import datetime
+import warnings
 
 
 st.set_page_config(
@@ -32,8 +33,9 @@ if df_choice == "Original":
 else:
     selected_df = df
 
-st.write(f'**Number of Rows:** {selected_df.shape[0]}')
-st.write(f'**Number of Columns:** {selected_df.shape[1]}')
+col1, col2 = st.columns(2)
+col1.metric(label='Number of Rows', value=selected_df.shape[0])
+col2.metric(label='Number of features', value=selected_df.shape[1])
 
 if df_choice == 'Original':
     columns_info = pd.DataFrame({
@@ -49,7 +51,19 @@ if df_choice == 'Original':
         ],
         'NaN Count': no_cleaning_df.isna().sum().values
     })
-    st.table(columns_info)
+    st.data_editor(
+        columns_info,
+        column_config={
+            'NaN Count': st.column_config.ProgressColumn(
+                'NaN Count',
+                help='The number of NaN values',
+                format="%f",
+                min_value=0,
+                max_value=90000,
+            ),
+        },
+        hide_index=True, use_container_width=True
+    )
 else:
     columns_info = pd.DataFrame({
     'Column name': df.columns,
@@ -66,14 +80,22 @@ else:
     ],
     'NaN Count': df.isna().sum().values
     })
-    st.table(columns_info)
+    st.dataframe(columns_info, hide_index=True, use_container_width=True)
+
+# Aggiungi un widget checkbox per controllare se visualizzare le prime 5 righe
+show_first_5_rows = st.toggle("Show first 5 rows")
+
+# Visualizza le prime 5 righe solo se la checkbox è selezionata
+if show_first_5_rows:
+    #st.subheader("First 5 rows of the DataFrame:")
+    st.dataframe(selected_df.head(), hide_index=True, use_container_width=True)
 
 # Mostra le informazioni corrispondenti all'Order ID inserito
 if df_choice == 'Cleaned':
     # Widget di input per inserire l'Order ID nella barra laterale
     remember_or_not = st.sidebar.radio('Do you remember your order ID?', ['Yes', 'No'], horizontal=True, index=None)
     if remember_or_not == 'Yes':
-        order_id_input = st.sidebar.text_input("Enter Order ID:", "")
+        order_id_input = st.sidebar.text_input("Enter Order ID:", placeholder='405-6458874-9383538', help='405-6458874-9383538')
         if order_id_input:
             try:
                 selected_row = df[df['order_ID'] == order_id_input]
@@ -132,3 +154,4 @@ if df_choice == 'Cleaned':
                 st.warning("Please, revision your selections.")
 
 
+warnings.filterwarnings("ignore", category=FutureWarning)

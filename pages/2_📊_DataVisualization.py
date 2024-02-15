@@ -1,6 +1,7 @@
 import streamlit as st
 from functions import *
 import altair as alt
+import warnings
 
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 df = df_cleaning_vis_phase(filepath)
@@ -128,5 +129,5 @@ elif show_net_revenue_chart == 'Sales over time':
 
 
 
-
+warnings.filterwarnings("ignore", category=FutureWarning)
 

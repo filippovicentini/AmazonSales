@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from functions import *
+import warnings
 
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 df = df_cleaning_modeling_phase(filepath)
@@ -254,7 +255,7 @@ if choose_model == 'Random Forest':
     
 
 
-
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 
 

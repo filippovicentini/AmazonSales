@@ -1,6 +1,7 @@
 import streamlit as st
 from functions import *
 import plotly.express as px
+import warnings
 
 
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
@@ -85,3 +86,4 @@ plt.xlabel("Weights [Coefficient]",fontsize = 12)
 plt.ylabel("Features", fontsize = 12)
 col2.pyplot(fig)
 
+warnings.filterwarnings("ignore", category=FutureWarning)
