@@ -260,6 +260,51 @@ def interactive_sales_by_product_size(filepath):
     # Using Streamlit to display the plot
     st.pyplot(fig)
 
+def sales_over_time(filepath, highlight_option):
+    df = df_cleaning_vis_phase(filepath)
+    
+    # Gruppo per data e calcola la somma delle vendite
+    sale_over_time = df.groupby('date')['order_amount_($)'].sum().reset_index()
+
+    # Utilizza Altair per creare un grafico a linee
+    chart = alt.Chart(sale_over_time).mark_line().encode(
+        x='date:T',
+        y=alt.Y('order_amount_($):Q', title='Net Revenue ($)')
+    ).properties(
+        width=800,
+        height=400
+    )
+
+    # Aggiungi le linee per il massimo, il minimo e la media
+    if highlight_option == 'Maximum':
+        max_value = sale_over_time.loc[sale_over_time['order_amount_($)'].idxmax()]
+        max_line = alt.Chart(pd.DataFrame({'date': [max_value['date']], 'order_amount_($)': [max_value['order_amount_($)']]})).mark_rule(color='red').encode(
+            x='date:T',
+            y='order_amount_($):Q'
+        )
+        chart += max_line
+        st.sidebar.metric(label='Max on '+max_value['date'].strftime('%Y-%m-%d'), value=round(max_value[1],2))
+    elif highlight_option == 'Minimum':
+        min_value = sale_over_time.loc[sale_over_time['order_amount_($)'].idxmin()]
+        min_line = alt.Chart(pd.DataFrame({'date': [min_value['date']], 'order_amount_($)': [min_value['order_amount_($)']]})).mark_rule(color='blue').encode(
+            x='date:T',
+            y='order_amount_($):Q'
+        )
+        chart += min_line
+        st.sidebar.metric(label='Min on '+min_value['date'].strftime('%Y-%m-%d'), value=round(min_value[1],2))
+    elif highlight_option == 'Mean':
+        mean_value = sale_over_time['order_amount_($)'].mean()
+        mean_line = alt.Chart(pd.DataFrame({'mean_value': [mean_value]})).mark_rule(color='green').encode(
+            y=alt.Y('mean_value:Q', title='Net Revenue ($)')
+        )
+        chart += mean_line
+        st.sidebar.metric(label='Mean', value=round(mean_value,2))
+
+    # Visualizza il grafico utilizzando Streamlit
+    st.altair_chart(chart, use_container_width=True)
+
+
+
 def interactive_quantity_size(filepath):
     # Cleaning the DataFrame
     df = df_cleaning_vis_phase(filepath)

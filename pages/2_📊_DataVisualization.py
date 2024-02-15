@@ -9,7 +9,7 @@ st.title(':blue[Data] :orange[Visualization] :bar_chart:')
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Widget per mostrare il grafico della net revenue
-show_net_revenue_chart = st.sidebar.radio('Select Chart :arrow_down:', ['Monthly Order Quantity Trend for Category','Amazon Net Revenue', 'Average Monthly Order Amount', 'Top Product Revenue by Month', 'Sales by Product Size'])
+show_net_revenue_chart = st.sidebar.radio('Select Chart :arrow_down:', ['Monthly Order Quantity Trend for Category', 'Sales over time', 'Amazon Net Revenue', 'Average Monthly Order Amount', 'Top Product Revenue by Month', 'Sales by Product Size'])
 if show_net_revenue_chart == 'Amazon Net Revenue':
     st.subheader(':blue[Amazon Net Revenue]', divider='orange')
     amazon_net_revenue_strim(filepath)
@@ -111,6 +111,20 @@ elif show_net_revenue_chart == 'Monthly Order Quantity Trend for Category':
     st.altair_chart(chart, use_container_width=True)
 
     st.markdown('This chart shows the **monthly order quantity trend** for the selected category in the selected month')
+elif show_net_revenue_chart == 'Sales over time':
+    st.subheader(':blue[Sales over time]', divider='orange')
+    highlight_option = st.selectbox('Choose what you want to see:', ['None', 'Maximum', 'Minimum', 'Mean'])
+    sales_over_time(filepath, highlight_option)
+    st.markdown("""
+                This graph shows daily revenue trends. 
+                In particular, we can derive the respective days of maximum and minimum revenues:
+                - **Max: 2022-05-04**
+                - **Min: 2022-06-29**
+
+                Also, if you look at the graph with in addition the option to view the average line,
+                 you can see that since May 8 there is a majority of revenues that are below average.
+                """)
+    
 
 
 
