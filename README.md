@@ -16,4 +16,5 @@ The project is divided mainly into three parts:
 - We shall make ORDER REJECTION CLASSIFICATION PREDICTION using two models based on:
   - Logistic Regression Classifier
   - Random Forest Classifier
+
 In addition, we would like to try to find out the features that most influence this event.
