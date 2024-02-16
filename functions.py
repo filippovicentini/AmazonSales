@@ -22,6 +22,8 @@ from sklearn.naive_bayes import GaussianNB
 
 set_config(display = "diagram")  
 
+#FUNCTION FOR DATA VISUALIZATION:
+#this function shows amazon net revenue
 def amazon_net_revenue_strim(filepath):
     df = df_cleaning_vis_phase(filepath)
     sns.set_style('whitegrid')
@@ -84,6 +86,7 @@ def amazon_net_revenue_strim(filepath):
 
     st.pyplot(fig)
 
+#this function shows average monthly order amount
 def interactive_average_monthly_order_amount(filepath):
     # Pulizia del DataFrame
     df = df_cleaning_vis_phase(filepath)
@@ -129,6 +132,7 @@ def interactive_average_monthly_order_amount(filepath):
     # Utilizzo di Streamlit per mostrare il grafico
     st.pyplot(fig)
 
+#this function shows the top product revenue by month
 def interactive_top_product_revenue_by_month(filepath):
     import warnings
     warnings.filterwarnings('ignore')
@@ -211,6 +215,7 @@ def interactive_top_product_revenue_by_month(filepath):
 
     warnings.filterwarnings('default')  # Re-enable the warnings
 
+#this function shows sales by product size
 def interactive_sales_by_product_size(filepath):
     # Cleaning the DataFrame
     df = df_cleaning_vis_phase(filepath)
@@ -260,6 +265,7 @@ def interactive_sales_by_product_size(filepath):
     # Using Streamlit to display the plot
     st.pyplot(fig)
 
+#this function shows sales over time
 def sales_over_time(filepath, highlight_option):
     df = df_cleaning_vis_phase(filepath)
     
@@ -303,6 +309,7 @@ def sales_over_time(filepath, highlight_option):
     # Visualizza il grafico utilizzando Streamlit
     st.altair_chart(chart, use_container_width=True)
 
+#this fnction shows the quantity of product sold by size
 def interactive_quantity_size(filepath):
     # Cleaning the DataFrame
     df = df_cleaning_vis_phase(filepath)
@@ -347,6 +354,32 @@ def interactive_quantity_size(filepath):
     # Using Streamlit to display the plot
     st.pyplot(fig)
 
+#FUNCTION FOR DATA CLEANING:
+    
+"""
+DATA CLEANING:
+- Columns to drop: 
+    Unnamed: 22 - undeterminable data, 
+    fulfilled-by - only value was amazon courier "easy-ship" with no other relationship, 
+    ship-country - The shipping Country is India, 
+    currency - the currency is Indian Rupee (INR),
+    Sales Channel - assumed to be sold through amazon
+- Date Range - April 1, 2022 to June 29, 2022
+- Columns dropduplicates()
+- Columns fillna():
+    Courier Status - will fill missing with 'Unknown'
+    promotion-ids - will fill missing with 'No Promotion'
+    Amount - will fill missing with 0, since 97% of all Orders with missing Amount are cancelled
+    ship-city, ship-state and ship-postal-code
+- Column Renaming and changing values:
+    B2B - changing to customer_type and changing the values to business and customer
+    Amount - changing to order_amount and converting from INR to $
+    date - dropping march from the datset since there is only 1 day (3/21/22) from the month representing 0.1%
+- Column Creation
+    month - to use in analysis and groupbys
+- Column Value Ordering
+    size - created an ordered category of based on product sizes
+"""
 #this function prepares the dataset for the visualization phase
 def df_cleaning_vis_phase(filepath):
     df = pd.read_csv(filepath, low_memory = False)
@@ -494,6 +527,8 @@ def df_cleaning_modeling_phase(filepath):
     # return clean dataset 
     return df
 
+#FUNCTION FOR MODELING PHASE:
+#this function shows the distribution of the target vector for the training set
 def plot_class_distr(y_train):
     # bar chvalue_countsg matplotlib package
     fig,ax = plt.subplots(figsize = (7,5))
@@ -529,6 +564,9 @@ def plot_class_distr(y_train):
 
     st.pyplot(fig)
 
+#this function compute the logistic regression and the random forest classification.
+#In particular it returns: confusion matrix for the training and test set, the roc curve
+#and also the top 10 features for each model.
 def logistic_and_forest(filepath, size):
     df = df_cleaning_modeling_phase(filepath)
     df['amount'].fillna(0,inplace=True)

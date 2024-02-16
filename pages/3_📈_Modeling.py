@@ -4,6 +4,9 @@ import numpy as np
 from functions import *
 import warnings
 
+#In this page I use Linear Regression and Random Forest Classifier in order to try to
+#predict order rejection and to understand the major features that affect it.
+
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 df = df_cleaning_modeling_phase(filepath)
 df['amount'].fillna(0,inplace=True)
@@ -14,6 +17,8 @@ st.markdown("""
 We shall make **ORDER REJECTION CLASSIFICATION PREDICTION** using two models based on:
   - **Logistic Regression Classifier**
   - **Random Forest Classifier**
+
+In addition, we would like to try to find out the features that most influence this event.
 """)
 
 #DATA POCESS

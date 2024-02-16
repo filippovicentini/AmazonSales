@@ -3,6 +3,7 @@ from functions import *
 import plotly.express as px
 import warnings
 
+#In this page I report the findings computed and I make the comparison between the two models.
 
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 st.title(':blue[Findings and] :orange[Discussions] 🔍')

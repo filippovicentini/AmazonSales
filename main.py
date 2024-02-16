@@ -1,27 +1,13 @@
 #import libraries and functions
 import pandas as pd
 import numpy as np
-import os 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import matplotlib.ticker as ticker
-from imblearn.over_sampling import RandomOverSampler
-from sklearn.preprocessing import OneHotEncoder,MinMaxScaler
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import make_pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.model_selection import GridSearchCV,train_test_split
-from sklearn.metrics import confusion_matrix,ConfusionMatrixDisplay,roc_curve,roc_auc_score
-from sklearn import set_config
-set_config(display = "diagram")  
+import matplotlib.pyplot as plt 
 from functions import *
 
 #loading dataset
 df = pd.read_csv('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
+
 """"
 #initial dataset view
 print(df.head())
@@ -182,31 +168,3 @@ avg_order_amount_by_customer_type = df.groupby('customer_type')['order_amount_($
 print("Average order amount by customer type:")
 print(avg_order_amount_by_customer_type.apply(lambda x: "${:,.2f}".format(x)))
 """
-#Show amazon net revenue
-#amazon_net_revenue('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
-#Show average monthly order amount
-#average_monthly_order_amount('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
-#Show top product revenue by month
-#top_product_revenue_by_month('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
-#Show sales by product size
-#sales_by_product_size('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
-#Show heatmap of quantity sold by Category and Size
-#heatmap_category_size('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
-#Show top 10 cities with the most orders
-#top_cities('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
-#Order rejection classification vice
-#order_rejection('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
-#Order rejection classification kaggle
-order_rejection_kaggle('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
-
-#df = df_cleaning_vis_phase(filepath)
-#filtered_df = df[(df['product_category'] == 'Blouse') & (df['month'] == 'june')]
-#monthly_quantity = filtered_df.groupby('date')['order_quantity'].sum()
-#print(monthly_quantity)

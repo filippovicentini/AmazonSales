@@ -3,6 +3,8 @@ from functions import *
 import altair as alt
 import warnings
 
+#In this page I report some charts related to Amazon Sale Dataset
+
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 df = df_cleaning_vis_phase(filepath)
 

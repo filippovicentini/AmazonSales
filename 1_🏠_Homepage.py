@@ -4,6 +4,8 @@ from functions import *
 import datetime
 import warnings
 
+#This is the homepage for the streamlit presentation. In this webApp I show the results, which
+#are computed in the 'functions' file.
 
 st.set_page_config(
     page_title='Amazon Sale Report',
@@ -16,7 +18,7 @@ st.title(':blue[Amazon] :orange[Sale] :blue[Report] :truck:')
 # Testo descrittivo con formattazione Markdown
 st.markdown("""
 In this web app, we analyze the **Amazon Sale Report** dataset downloaded from Kaggle. 
-The dataset provides information on Amazon sales in India that occurred in April, May, and June. 
+The dataset provides information on Amazon sales in India that occurred in April, May, and June 2022. 
 Let's explore the data to derive insights and predictions! :bar_chart:""")
 
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
