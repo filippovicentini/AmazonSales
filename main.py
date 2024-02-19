@@ -8,7 +8,7 @@ from functions import *
 df = pd.read_csv('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 
-""""
+
 #initial dataset view
 print(df.head())
 print()
@@ -19,9 +19,8 @@ print()
 print(df.apply(pd.unique).to_frame(name='Unique Values'))
 print()
 print(df.describe().T)
-where_nan(df)
 print(df.isnull().sum())
-"""
+
 """
 DATA CLEANING:
 - Columns to drop: 
@@ -46,67 +45,7 @@ DATA CLEANING:
 - Column Value Ordering
     size - created an ordered category of based on product sizes
 """
-"""
-#dropping columns
-df.drop(columns= ['index','Unnamed: 22', 'fulfilled-by', 'ship-country', 
-                  'currency', 'Sales Channel '], inplace = True)
-
-#dropping duplicates
-#df[df.duplicated(['Order ID','ASIN'], keep=False)]
-#len(df)-len(df.drop_duplicates(['Order ID','ASIN']))
-df.drop_duplicates(['Order ID','ASIN'],inplace = True,ignore_index=True)
-
-#filling NaN values
-df['Courier Status'].fillna('unknown',inplace=True)
-df['promotion-ids'].fillna('no promotion',inplace=True)
-print()
-print(df[df['Amount'].isnull()]['Status'].value_counts(normalize=True).apply(lambda x: format(x, '.2%')))
-print()
-df['Amount'].fillna(0,inplace=True)
-df['ship-city'].fillna('unknown', inplace = True)
-df['ship-postal-code'] = df['ship-postal-code'].astype(str)
-df['ship-postal-code'].fillna('unknown', inplace=True)
-df['ship-state'].fillna('unknown', inplace = True)
-
-#renaming columns
-mapper = {'Order ID':'order_ID', 'Date':'date', 'Status':'ship_status','Fulfilment':'fullfilment',
-          'ship-service-level':'service_level', 'Style':'style', 'SKU':'sku', 'Category':'product_category', 
-          'Size':'size', 'ASIN':'asin', 'Courier Status':'courier_ship_status', 'Qty':'order_quantity', 
-          'Amount':'order_amount_($)', 'ship-city':'city', 'ship-state':'state', 'ship-postal-code':'zip', 
-          'promotion-ids':'promotion','B2B':'customer_type'}
-df.rename(columns=mapper, inplace =True)
-
-#Convert INR to USD using an exchange rate of 1 INR = 0.014 USD
-exchange_rate = 0.0120988
-df['order_amount_($)'] = df['order_amount_($)'].apply(lambda x: x * exchange_rate)
-
-#Convert B2B column values
-df['customer_type'].replace(to_replace=[True,False],value=['business','customer'], inplace=True)
-
-#Creating Datetime and adding Month column
-df['date'] = pd.to_datetime(df['date'], format='%m-%d-%y')
-# Filter to only include dates in March
-march_dates = df['date'][df['date'].dt.month == 3]
-# Get the number of unique days in March
-march_dates.dt.day.nunique()
-# dropping March dates from the dataset
-df = df[(df['date'].dt.month != 3)]
-df['month'] = df['date'].dt.month
-df["month"].unique()
-month_map = { 4: 'april',5: 'may',6: 'june'}
-df['month'] = df['date'].dt.month.map(month_map)
-# Define the desired order of months
-month_order = ['april', 'may', 'june']
-# Convert the month column to a categorical data type with the desired order
-df['month'] = pd.Categorical(df['month'], categories=month_order, ordered=True)
-print(f'This dataset contains the months {df["month"].unique()} for 2022')
-print(f'The earliest date is {df["date"].min()}')
-print(f'The latest date is {df["date"].max()}')
-#Column Value Ordering
-# Define the desired order for the 'size' column
-size_order = ['Free','XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL']
-# Create an ordered categorical variable for the 'size' column
-df['size'] = pd.Categorical(df['size'], categories=size_order, ordered=True)
+df = df_cleaning_vis_phase(filepath)
 
 #DATA VISUALIZATION:
 #Preliminary Insight
@@ -167,4 +106,4 @@ print("\n")
 avg_order_amount_by_customer_type = df.groupby('customer_type')['order_amount_($)'].mean()
 print("Average order amount by customer type:")
 print(avg_order_amount_by_customer_type.apply(lambda x: "${:,.2f}".format(x)))
-"""
+
