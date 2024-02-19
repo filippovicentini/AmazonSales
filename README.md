@@ -6,11 +6,11 @@ The project is divided mainly into three parts:
 ## Data Cleaning
 - In this phase the df is prepared for the Visualization phase and the Modeling phase:
   - Columns to drop: 
-        - Unnamed: 22 - undeterminable data, 
-        - fulfilled-by - only value was amazon courier "easy-ship" with no other relationship, 
-        - ship-country - The shipping Country is India, 
-        - currency - the currency is Indian Rupee (INR),
-        - Sales Channel - assumed to be sold through amazon
+    - Unnamed: 22 - undeterminable data, 
+    - fulfilled-by - only value was amazon courier "easy-ship" with no other relationship, 
+    - ship-country - The shipping Country is India, 
+    - currency - the currency is Indian Rupee (INR),
+    - Sales Channel - assumed to be sold through amazon
   - Date Range - April 1, 2022 to June 29, 2022
   - Columns dropduplicates()
   - Columns fillna():
