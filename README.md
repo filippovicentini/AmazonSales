@@ -39,4 +39,4 @@ The project is divided mainly into three parts:
   - Logistic Regression Classifier
   - Random Forest Classifier
 
-In addition, we would like to try to find out the features that most influence this event and also make a comparison between logistic Regression Classifier and Random Forest Classifier
+In addition, we would like to try to find out the features that most influence this event and also make a comparison between Logistic Regression and Random Forest Classifier.
