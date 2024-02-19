@@ -11,7 +11,8 @@ The project is divided mainly into three parts:
     - Average Monthly Order Amount 
     - Top Product Revenue by Month
     - Sales by Product Size
-    - Sales Over Time 
+    - Sales Over Time
+    - Monthly Order Quantity Trend for Category
 ## Modeling
 - We shall make ORDER REJECTION CLASSIFICATION PREDICTION using two models based on:
   - Logistic Regression Classifier
