@@ -153,6 +153,12 @@ if choose_model == 'Logistic Regression':
         fig,ax = plt.subplots(figsize = (5,5))
         ConfusionMatrixDisplay.from_estimator(logistic_model,X_train_over,y_train_over,
                                         ax = ax, colorbar=False)
+        # Rimuovi le linee della griglia
+        ax.xaxis.set_ticks_position('none')
+        ax.yaxis.set_ticks_position('none')
+        ax.xaxis.set_tick_params(width=0)
+        ax.yaxis.set_tick_params(width=0)
+        ax.grid(False)
         st.pyplot(fig)
         st.sidebar.metric(label='Accuracy Score', value=accuracy_train_lg)
         st.sidebar.metric(label='Precision Score', value=precision_train_lg)
@@ -161,6 +167,12 @@ if choose_model == 'Logistic Regression':
         fig,ax = plt.subplots(figsize = (5,5))
         ConfusionMatrixDisplay.from_estimator(logistic_model,X_test,y_test,
                                         ax = ax, colorbar=False)
+        # Rimuovi le linee della griglia
+        ax.xaxis.set_ticks_position('none')
+        ax.yaxis.set_ticks_position('none')
+        ax.xaxis.set_tick_params(width=0)
+        ax.yaxis.set_tick_params(width=0)
+        ax.grid(False)
         st.pyplot(fig)
         st.sidebar.metric(label='Accuracy Score', value=accuracy_test_lg)
         st.sidebar.metric(label='Precision Score', value=precision_test_lg)
@@ -208,6 +220,12 @@ if choose_model == 'Random Forest':
         fig,ax = plt.subplots(figsize = (5,5))
         ConfusionMatrixDisplay.from_estimator(model,X_trainrf,y_trainrf,
                                         ax = ax, colorbar=False)
+        # Rimuovi le linee della griglia
+        ax.xaxis.set_ticks_position('none')
+        ax.yaxis.set_ticks_position('none')
+        ax.xaxis.set_tick_params(width=0)
+        ax.yaxis.set_tick_params(width=0)
+        ax.grid(False)
         st.pyplot(fig)
         st.sidebar.metric(label='Accuracy Score', value=accuracy_train_rf)
         st.sidebar.metric(label='Precision Score', value=precision_train_rf)
@@ -216,6 +234,12 @@ if choose_model == 'Random Forest':
         fig,ax = plt.subplots(figsize = (5,5))
         ConfusionMatrixDisplay.from_estimator(model,X_testrf,y_testrf,
                                         ax = ax, colorbar=False)
+        # Rimuovi le linee della griglia
+        ax.xaxis.set_ticks_position('none')
+        ax.yaxis.set_ticks_position('none')
+        ax.xaxis.set_tick_params(width=0)
+        ax.yaxis.set_tick_params(width=0)
+        ax.grid(False)
         st.pyplot(fig)
         st.sidebar.metric(label='Accuracy Score', value=accuracy_test_rf)
         st.sidebar.metric(label='Precision Score', value=precision_test_rf)

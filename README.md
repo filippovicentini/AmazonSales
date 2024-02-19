@@ -1,5 +1,5 @@
 # AmazonSales
-The project consists of an analysis performed on the dataset Amazon Sale Report downloading from kaggle (https://www.kaggle.com/datasets/thedevastator/unlock-profits-with-e-commerce-sales-data?select=Amazon+Sale+Report.csv). The dataset reports some informations about Amazon sales in India in April, May and June 2022.
+The project consists of an analysis performed on the dataset Amazon Sale Report downloading from kaggle (https://www.kaggle.com/datasets/thedevastator/unlock-profits-with-e-commerce-sales-data?select=Amazon+Sale+Report.csv). The dataset reports some informations about Amazon sales in India in April, May and June 2022. To view the streamlit presentation run the file 1_🏠_Homepage.py.
 
 The project is divided mainly into three parts:
 
