@@ -1,4 +1,3 @@
-#import libraries and functions
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt 
@@ -8,6 +7,8 @@ from functions import *
 df = pd.read_csv('/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv')
 filepath = '/Users/filippovicentini/Desktop/programming_project/AmazonSales/datasets/Amazon Sale Report.csv'
 
+#this file is used only to show initial dataset view and to compute preliminary insights. 
+#To see the full project and the streamlit presentation run the file 1_🏠_Homepage.py
 
 #initial dataset view
 print(df.head())

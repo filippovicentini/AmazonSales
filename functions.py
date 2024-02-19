@@ -564,7 +564,7 @@ def plot_class_distr(y_train):
     st.pyplot(fig)
 
 #this function compute the logistic regression and the random forest classification.
-#In particular it returns: confusion matrix for the training and test set, the roc curve
+#In particular it returns: confusion matrix for the test set, the roc curve
 #and also the top 10 features for each model.
 def logistic_and_forest(filepath, size):
     df = df_cleaning_modeling_phase(filepath)
