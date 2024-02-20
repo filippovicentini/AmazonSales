@@ -155,5 +155,5 @@ if df_choice == 'Cleaned':
             except ValueError:
                 st.warning("Please, revision your selections.")
 
-
+#warning for future errors
 warnings.filterwarnings("ignore", category=FutureWarning)
